@@ -74,7 +74,7 @@ public class PrintContent {
                         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                         FilterManager manager = new FilterManager();
                         AttributesImage attributesImage = new AttributesImage();
-                        attributesImage.setDoScale(false);
+//                        attributesImage.setDoScale(true);
                         attributesImage.graphicFilter = 6;
                         Bitmap newbitmap = manager.printImage(bitmap, attributesImage);
                         esc.addRastBitImage(newbitmap, 576, 0);
