@@ -3,6 +3,7 @@ package com.example.bluetooth_print;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.util.Log;
+import java.nio.*;
 
 public class FilterManager {
     public Bitmap printImage(Bitmap bitmap, final AttributesImage attributesImage) {
@@ -126,9 +127,17 @@ public class FilterManager {
                 outOfMemoryError.printStackTrace();
                 return null;
             }
+
         }
 
         return null;
+    }
+
+    public static byte[] convertBitmapToByteArray(Bitmap bitmap){
+        ByteBuffer byteBuffer = ByteBuffer.allocate(bitmap.getByteCount());
+        bitmap.copyPixelsToBuffer(byteBuffer);
+        byteBuffer.rewind();
+        return byteBuffer.array();
     }
 
     public void graphics(final byte[] array, final int n, final int n2) {

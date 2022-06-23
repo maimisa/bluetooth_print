@@ -72,7 +72,12 @@ public class PrintContent {
                   }else if("image".equals(type)){
                         byte[] bytes = Base64.decode(content, Base64.DEFAULT);
                         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        esc.addRastBitImage(bitmap, 576, 0);
+                        FilterManager manager = new FilterManager();
+                        AttributesImage attributesImage = new AttributesImage();
+                        attributesImage.setDoScale(false);
+                        attributesImage.graphicFilter = 6;
+                        Bitmap newbitmap = manager.printImage(bitmap, attributesImage);
+                        esc.addRastBitImage(newbitmap, 576, 0);
                   }
 
                   if(linefeed == 1){
@@ -146,9 +151,7 @@ public class PrintContent {
                   }else if("image".equals(type)){
                         byte[] bytes = Base64.decode(content, Base64.DEFAULT);
                         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        FilterManager manager = new FilterManager();
-                        Bitmap newBitMap = manager.printImage(bitmap, new AttributesImage());
-                        tsc.addBitmap(x, y, LabelCommand.BITMAP_MODE.OVERWRITE, 300, newBitMap);
+                        tsc.addBitmap(x, y, LabelCommand.BITMAP_MODE.OVERWRITE, 300, bitmap);
                   }
             }
 
