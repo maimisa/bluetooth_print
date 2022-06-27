@@ -78,8 +78,8 @@ public class PrintContent {
                         FilterManager manager = new FilterManager(paperWidth);
                         AttributesImage attributesImage = new AttributesImage();
                         attributesImage.graphicFilter = graphicFilter;
-                        Bitmap newbitmap = manager.printImage(bitmap, attributesImage);
-                        esc.addRastBitImage(newbitmap, width, weight);
+                        Bitmap newBitmap = manager.printImage(bitmap, attributesImage);
+                        esc.addRastBitImage(newBitmap, paperWidth, weight);
                   }
 
                   if(linefeed == 1){
