@@ -25,6 +25,9 @@ public class PrintContent {
             //打印走纸多少个单位
             esc.addPrintAndFeedLines((byte) 3);
 
+            int paperWidth = (int)(config.get("paperWidth")==null?576:config.get("paperWidth"));
+            int graphicFilter = (int)(config.get("graphicFilter")==null?6:config.get("graphicFilter"));
+
             // {type:'text|barcode|qrcode|image', content:'', size:4, align: 0|1|2, weight: 0|1, width:0|1, height:0|1, underline:0|1, linefeed: 0|1}
             for (Map<String,Object> m: list) {
                   String type = (String)m.get("type");
@@ -72,11 +75,11 @@ public class PrintContent {
                   }else if("image".equals(type)){
                         byte[] bytes = Base64.decode(content, Base64.DEFAULT);
                         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        FilterManager manager = new FilterManager();
+                        FilterManager manager = new FilterManager(paperWidth);
                         AttributesImage attributesImage = new AttributesImage();
-                        attributesImage.graphicFilter = 6;
+                        attributesImage.graphicFilter = graphicFilter;
                         Bitmap newbitmap = manager.printImage(bitmap, attributesImage);
-                        esc.addRastBitImage(newbitmap, 576, 0);
+                        esc.addRastBitImage(newbitmap, width, weight);
                   }
 
                   if(linefeed == 1){
