@@ -157,4 +157,30 @@ class BluetoothPrint {
   }
 
   Future<dynamic> printTest() => _channel.invokeMethod('printTest');
+
+  Future<List<int>?> mapToReceipt(
+    List<LineText> data, [
+    Map<String, dynamic> config = const {'width': 0},
+  ]) async {
+    final args = getChannelArguments(config, data);
+
+    return await _channel.invokeListMethod('mapToEscCommand', args);
+  }
+
+  Future<List<int>?> mapToLabel(
+      Map<String, dynamic> config, List<LineText> data) async {
+    final args = getChannelArguments(config, data);
+
+    return await _channel.invokeListMethod('mapToTscCommand', args);
+  }
+}
+
+Map<String, dynamic> getChannelArguments(
+  Map<String, dynamic> config,
+  List<LineText> data,
+) {
+  return <String, dynamic>{
+    'config': config,
+    'data': data.map((m) => m.toJson()).toList(),
+  };
 }
