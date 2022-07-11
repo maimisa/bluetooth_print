@@ -120,7 +120,8 @@
          result([self mapToTscCommand:args]);
        } @catch(FlutterError *e) {
          result(e);
-       }  else if([@"printReceipt" isEqualToString:call.method]) {
+       }  
+  } else if([@"printReceipt" isEqualToString:call.method]) {
        @try {
          NSDictionary *args = [call arguments];
          [Manager write:[self mapToEscCommand:args]];
