@@ -154,6 +154,8 @@
     NSNumber *width = ![config objectForKey:@"width"]?@"48" : [config objectForKey:@"width"];
     NSNumber *height = ![config objectForKey:@"height"]?@"80" : [config objectForKey:@"height"];
     NSNumber *gap = ![config objectForKey:@"gap"]?@"2" : [config objectForKey:@"gap"];
+
+    // int paperWidth = (int)(config.get("paperWidth")==null?576:config.get("paperWidth"));
     
     TscCommand *command = [[TscCommand alloc]init];
     // 设置标签尺寸宽高，按照实际尺寸设置 单位mm
@@ -194,6 +196,39 @@
     return [command getCommand];
 }
 
+- (UIImage *)convertImageToGrayScale:(UIImage *)image {
+    // Create image rectangle with current image width/height
+    CGRect imageRect = CGRectMake(0, 0, image.size.width, image.size.height);
+
+    // Grayscale color space
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceGray();
+
+    // Create bitmap content with current image size and grayscale colorspace
+    CGContextRef context = CGBitmapContextCreate(nil, image.size.width, image.size.height, 8, 0, colorSpace, kCGImageAlphaNone);
+
+    // Draw image into current context, with specified rectangle
+    // using previously defined context (with grayscale colorspace)
+    CGContextDrawImage(context, imageRect, [image CGImage]);
+
+    // Create bitmap image info from pixel data in current context
+    CGImageRef imageRef = CGBitmapContextCreateImage(context);
+
+    // Release colorspace, context and bitmap information
+    CGColorSpaceRelease(colorSpace);
+    CGContextRelease(context);
+
+    context = CGBitmapContextCreate(nil,image.size.width, image.size.height, 8, 0, nil, kCGImageAlphaOnly );
+    CGContextDrawImage(context, imageRect, [image CGImage]);
+    CGImageRef mask = CGBitmapContextCreateImage(context);
+
+    // Create a new UIImage object
+    UIImage *newImage = [UIImage imageWithCGImage:CGImageCreateWithMask(imageRef, mask)];
+    CGImageRelease(imageRef);
+    CGImageRelease(mask);
+    // Return the new grayscale image
+    return newImage;
+}
+
 -(NSData *)mapToEscCommand:(NSDictionary *) args {
     NSDictionary *config = [args objectForKey:@"config"];
     NSMutableArray *list = [args objectForKey:@"data"];
@@ -201,6 +236,8 @@
     EscCommand *command = [[EscCommand alloc]init];
     [command addInitializePrinter];
     [command addPrintAndFeedLines:3];
+
+    NSNumber *paperWidth = ![config objectForKey:@"paperWidth"]?@576 : [config objectForKey:@"paperWidth"];
 
     for(NSDictionary *m in list){
         
@@ -233,8 +270,8 @@
             [command addQRCodePrintwithpL:0 withpH:0 withcn:0 withyfn:0 withm:0];
         }else if([@"image" isEqualToString:type]){
             NSData *decodeData = [[NSData alloc] initWithBase64EncodedString:content options:0];
-            UIImage *image = [UIImage imageWithData:decodeData];
-            [command addOriginrastBitImage:image width:576];
+            UIImage *image = [self convertImageToGrayScale: [UIImage imageWithData:decodeData]];
+            [command addOriginrastBitImage:image width:[paperWidth intValue]];
         }
         
         if([linefeed isEqualToNumber:@1]){
