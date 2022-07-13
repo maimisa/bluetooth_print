@@ -229,6 +229,13 @@
     return newImage;
 }
 
+- (UIImage *)grayscaleImage:(UIImage *)image {
+    CIImage *ciImage = [[CIImage alloc] initWithImage:image];
+    CIImage *grayscale = [ciImage imageByApplyingFilter:@"CIColorControls"
+        withInputParameters: @{kCIInputSaturationKey : @0.0}];
+    return [UIImage imageWithCIImage:grayscale];
+}
+
 -(NSData *)mapToEscCommand:(NSDictionary *) args {
     NSDictionary *config = [args objectForKey:@"config"];
     NSMutableArray *list = [args objectForKey:@"data"];
@@ -269,8 +276,9 @@
             [command addQRCodeSavewithpL:0x0b withpH:0 withcn:0x31 withyfn:0x50 withm:0x30 withData:[content dataUsingEncoding:NSUTF8StringEncoding]];
             [command addQRCodePrintwithpL:0 withpH:0 withcn:0 withyfn:0 withm:0];
         }else if([@"image" isEqualToString:type]){
+          NSLog('print image.');
             NSData *decodeData = [[NSData alloc] initWithBase64EncodedString:content options:0];
-            UIImage *image = [self convertImageToGrayScale: [UIImage imageWithData:decodeData]];
+            UIImage *image = [self grayscaleImage: [UIImage imageWithData:decodeData]];
             [command addOriginrastBitImage:image width:[paperWidth intValue]];
         }
         
