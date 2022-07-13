@@ -276,9 +276,8 @@
             [command addQRCodeSavewithpL:0x0b withpH:0 withcn:0x31 withyfn:0x50 withm:0x30 withData:[content dataUsingEncoding:NSUTF8StringEncoding]];
             [command addQRCodePrintwithpL:0 withpH:0 withcn:0 withyfn:0 withm:0];
         }else if([@"image" isEqualToString:type]){
-          NSLog(@"print image.");
             NSData *decodeData = [[NSData alloc] initWithBase64EncodedString:content options:0];
-            UIImage *image = [self grayscaleImage: [UIImage imageWithData:decodeData]];
+            UIImage *image = [self convertImageToGrayScale: [UIImage imageWithData:decodeData]];
             [command addOriginrastBitImage:image width:[paperWidth intValue]];
         }
         
