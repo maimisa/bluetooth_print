@@ -232,7 +232,7 @@
 - (UIImage *)grayscaleImage:(UIImage *)image {
     CIImage *ciImage = [[CIImage alloc] initWithImage:image];
     CIImage *grayscale = [ciImage imageByApplyingFilter:@"CIColorControls"
-        withInputParameters: @{kCIInputSaturationKey : @0.0, kCIInputBrightnessKey : @0.0, kCIInputContrastKey : @1.0}];
+        withInputParameters: @{kCIInputSaturationKey : @0.0, kCIInputBrightnessKey : @0.0, kCIInputContrastKey : @10.0}];
     return [UIImage imageWithCIImage:grayscale];
 }
 
