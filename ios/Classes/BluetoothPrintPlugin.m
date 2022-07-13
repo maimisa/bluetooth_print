@@ -229,6 +229,77 @@
     return newImage;
 }
 
+// Retrieves the bits from the context once the image has been drawn.
+- (unsigned char *)bitmapFromImage:(UIImage *)image {
+
+    // Creates a bitmap from the given image.
+    CGContextRef contex = CreateARGBBitmapContext(image.size);
+    if (contex == NULL) {
+        return NULL;
+    }
+
+    CGRect rect = CGRectMake(0.0f, 0.0f, image.size.width, image.size.height);
+    CGContextDrawImage(contex, rect, image.CGImage);
+    unsigned char *data = CGBitmapContextGetData(contex);
+    CGContextRelease(contex);
+
+    return data;
+}
+
+// Fills an image with bits.
+- (UIImage *)imageWithBits:(unsigned char *)bits withSize:(CGSize)size {
+
+    // Creates a color space
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    if (colorSpace == NULL) {
+
+        fprintf(stderr, "Error allocating color space\n");
+        free(bits);
+        return nil;
+    }
+
+    CGContextRef context = CGBitmapContextCreate (bits, size.width, size.height, 8, size.width * 4, colorSpace, kCGImageAlphaPremultipliedFirst);
+    if (context == NULL) {
+
+        fprintf (stderr, "Error. Context not created\n");
+        free (bits);
+        CGColorSpaceRelease(colorSpace );
+        return nil;
+    }
+
+    CGColorSpaceRelease(colorSpace );
+    CGImageRef ref = CGBitmapContextCreateImage(context);
+    free(CGBitmapContextGetData(context));
+    CGContextRelease(context);
+
+    UIImage *img = [UIImage imageWithCGImage:ref];
+    CFRelease(ref);
+    return img;
+}
+
+// Gets an pure black and white image from an original image.
+- (UIImage *)pureBlackAndWhiteImage:(UIImage *)image {
+
+    unsigned char *dataBitmap = [self bitmapFromImage:image];
+
+    for (int i = 0; i < image.size.width * image.size.height * 4; i += 4) {
+
+        if ((dataBitmap[i + 1] + dataBitmap[i + 2] + dataBitmap[i + 3]) < (255 * 3 / 2)) {
+            dataBitmap[i + 1] = 0;
+            dataBitmap[i + 2] = 0;
+            dataBitmap[i + 3] = 0;
+        } else {
+            dataBitmap[i + 1] = 255;
+            dataBitmap[i + 2] = 255;
+            dataBitmap[i + 3] = 255;
+        }
+    }
+
+    image = [self imageWithBits:dataBitmap withSize:image.size];
+
+    return image;
+}
+
 - (UIImage *)grayscaleImage:(UIImage *)image {
     CIImage *ciImage = [[CIImage alloc] initWithImage:image];
     CIImage *grayscale = [ciImage imageByApplyingFilter:@"CIColorControls"
@@ -277,7 +348,7 @@
             [command addQRCodePrintwithpL:0 withpH:0 withcn:0 withyfn:0 withm:0];
         }else if([@"image" isEqualToString:type]){
             NSData *decodeData = [[NSData alloc] initWithBase64EncodedString:content options:0];
-            UIImage *image = [self convertImageToGrayScale: [UIImage imageWithData:decodeData]];
+            UIImage *image = [self pureBlackAndWhiteImage: [UIImage imageWithData:decodeData]];
             [command addOriginrastBitImage:image width:[paperWidth intValue]];
         }
         
